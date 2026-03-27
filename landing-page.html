@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS-SOC | Enterprise Security for Everyone</title>
+    <meta name="description" content="Complete cybersecurity operations platform. Detect threats, respond instantly, and stay compliant. 95% cheaper than Splunk.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099ff;
+            --bg-dark: #0a0e27;
+            --bg-darker: #050810;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #7c3aed;
+            --success: #10b981;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f1535 100%);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .cta-nav {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cta-nav:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Comparison Section */
+        .comparison {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 212, 255, 0.02);
+            border-radius: 20px;
+            margin-top: 3rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(0, 212, 255, 0.05);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .check {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .cross {
+            color: #ef4444;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.8) 0%, rgba(15, 21, 53, 0.8) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .pricing-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .pricing-features li {
+            padding: 0.8rem 0;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .pricing-features li:before {
+            content: '✓ ';
+            color: var(--success);
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        /* CTA Section */
+        .cta-final {
+            padding: 6rem 2rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cta-final h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .cta-final p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            padding: 4rem 2rem;
+            background: rgba(0, 212, 255, 0.02);
+            border-radius: 20px;
+            margin-top: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .proof-title {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial {
+            background: rgba(20, 24, 41, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .testimonial-text {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .testimonial-role {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 6rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: rgba(20, 24, 41, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .faq-question {
+            font-weight: 700;
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            color: var(--text-muted);
+            margin-top: 1rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            padding-top: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .hero-desc {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">⚔️ AEGIS-SOC</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#comparison">vs Competitors</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <button class="cta-nav">Start Free Trial</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">⚡ The affordable alternative to Splunk</div>
+            <h1>Enterprise Security Operations<br><span>Made Simple & Affordable</span></h1>
+            <p class="hero-desc">
+                Detect threats in real-time, respond instantly, and stay compliant.
+                All-in-one security platform for enterprises, mid-market, and SMBs.
+                <strong>95% cheaper than competitors. 10x faster to deploy.</strong>
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Cheaper than Splunk</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">30 min</div>
+                    <div class="stat-label">To deploy</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">30+</div>
+                    <div class="stat-label">Features included</div>
+                </div>
+            </div>
+
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Start Free Trial</button>
+                <button class="btn btn-secondary">Watch Demo</button>
+            </div>
+
+            <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">
+                ✓ Free 14-day trial • ✓ No credit card required • ✓ Full access
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Everything You Need in <span>One Platform</span></h2>
+        <p class="section-subtitle">Stop managing 6 different security tools. Get all the features you need in AEGIS-SOC.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Alert Management</h3>
+                <p>Real-time threat detection with intelligent prioritization. Reduce alert fatigue by 70% with AI-powered filtering.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Automated Response</h3>
+                <p>Execute playbooks automatically. Contain threats in minutes, not hours. Respond faster than your competitors.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>DLP Protection</h3>
+                <p>Prevent data breaches before they happen. Scan content, detect sensitive data, and stop exfiltration.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">☁️</div>
+                <h3>Cloud Security</h3>
+                <p>Monitor AWS, Azure, GCP. Compliance checks, auto-remediation, and cloud-native threat detection.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered Detection</h3>
+                <p>Machine learning models detect anomalies competitors miss. Reduce false positives by 50%.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Compliance Ready</h3>
+                <p>GDPR, HIPAA, PCI-DSS, SOX. Automated compliance reporting. Pass audits faster.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison" id="comparison">
+        <h2 class="section-title">Why Choose <span>AEGIS-SOC?</span></h2>
+        <p class="section-subtitle">Compare with market leaders</p>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>AEGIS-SOC</th>
+                    <th>Splunk</th>
+                    <th>Elastic</th>
+                    <th>Datadog</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Monthly Cost</strong></td>
+                    <td class="check">$99-999</td>
+                    <td>$5,000+</td>
+                    <td>$1,500+</td>
+                    <td>$1,000+</td>
+                </tr>
+                <tr>
+                    <td><strong>Setup Time</strong></td>
+                    <td class="check">30 minutes</td>
+                    <td>2-3 weeks</td>
+                    <td>2-4 weeks</td>
+                    <td>1-2 weeks</td>
+                </tr>
+                <tr>
+                    <td><strong>DLP Included</strong></td>
+                    <td class="check">✓</td>
+                    <td>Separate tool</td>
+                    <td>Separate tool</td>
+                    <td>Separate tool</td>
+                </tr>
+                <tr>
+                    <td><strong>SOAR Automation</strong></td>
+                    <td class="check">✓</td>
+                    <td>Extra cost</td>
+                    <td>Extra cost</td>
+                    <td>Extra cost</td>
+                </tr>
+                <tr>
+                    <td><strong>Cloud Security</strong></td>
+                    <td class="check">✓</td>
+                    <td>Extra cost</td>
+                    <td>Extra cost</td>
+                    <td>✓</td>
+                </tr>
+                <tr>
+                    <td><strong>AI Detection</strong></td>
+                    <td class="check">Built-in</td>
+                    <td>Extra cost</td>
+                    <td>Extra cost</td>
+                    <td>Built-in</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="text-align: center; margin-top: 2rem; color: var(--text-muted);">
+            <strong>Bottom line:</strong> Get enterprise features at SMB prices. No per-component costs.
+        </p>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <h2 class="section-title">Simple, Transparent <span>Pricing</span></h2>
+        <p class="section-subtitle">No surprises. No hidden fees. Cancel anytime.</p>
+
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-name">Starter</div>
+                <div class="pricing-price">$99<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Up to 10 users</li>
+                    <li>Basic threat detection</li>
+                    <li>Alert management</li>
+                    <li>Community support</li>
+                </ul>
+                <button class="btn btn-secondary" style="width: 100%;">Start Free Trial</button>
+            </div>
+
+            <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <div class="pricing-name">Professional</div>
+                <div class="pricing-price">$999<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Up to 100 users</li>
+                    <li>All features included</li>
+                    <li>AI detection</li>
+                    <li>Email support</li>
+                </ul>
+                <button class="btn btn-primary" style="width: 100%;">Start Free Trial</button>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-name">Enterprise</div>
+                <div class="pricing-price">Custom</div>
+                <ul class="pricing-features">
+                    <li>Unlimited users</li>
+                    <li>All features</li>
+                    <li>Dedicated support</li>
+                    <li>Custom deployment</li>
+                </ul>
+                <button class="btn btn-secondary" style="width: 100%;">Contact Sales</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <h2 class="section-title">Trusted by Security Teams</h2>
+
+        <div class="testimonials">
+            <div class="testimonial">
+                <div class="testimonial-text">
+                    "AEGIS-SOC cut our security spend by 80%. We eliminated 5 different tools and now have better detection."
+                </div>
+                <div class="testimonial-author">Sarah Chen</div>
+                <div class="testimonial-role">CISO, Tech Startup (500 employees)</div>
+            </div>
+
+            <div class="testimonial">
+                <div class="testimonial-text">
+                    "We went from 2-hour response times to 10 minutes. The automated playbooks are game-changing."
+                </div>
+                <div class="testimonial-author">James Rodriguez</div>
+                <div class="testimonial-role">Security Manager, FinTech</div>
+            </div>
+
+            <div class="testimonial">
+                <div class="testimonial-text">
+                    "As a startup, we couldn't afford Splunk. AEGIS-SOC gave us enterprise security for a fraction of the cost."
+                </div>
+                <div class="testimonial-author">Emma Johnson</div>
+                <div class="testimonial-role">Founder, Cybersecurity Firm</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-final" id="cta">
+        <h2>Stop Overpaying for Security</h2>
+        <p>
+            Get enterprise-grade threat detection, automated response, and compliance management.
+            95% cheaper than competitors.
+        </p>
+        <div class="hero-buttons" style="justify-content: center;">
+            <button class="btn btn-primary">Start 14-Day Free Trial</button>
+            <button class="btn btn-secondary">Schedule Demo</button>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 1.5rem;">✓ No credit card • ✓ Full access • ✓ Cancel anytime</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>How long does it take to set up?</span>
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                30 minutes with our automated setup, or 2-3 hours for full configuration. Your first alerts start in 2 hours.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Can I integrate with my existing tools?</span>
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                Yes! AEGIS-SOC integrates with 50+ security tools including Splunk, ElasticSearch, AWS, Azure, GCP, and more.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Is there a setup fee?</span>
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                No. AEGIS-SOC is fully self-service. You can deploy in 30 minutes without contacting us.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>What if I need to cancel?</span>
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                Cancel anytime, no questions asked. You only pay for the months you use.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>Is my data secure?</span>
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                Yes. All data is encrypted at rest and in transit. AEGIS-SOC meets GDPR, HIPAA, PCI-DSS compliance.
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="">Security</a>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <a href="">About</a>
+                <a href="">Blog</a>
+                <a href="">Careers</a>
+                <a href="">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <a href="">Documentation</a>
+                <a href="">API Reference</a>
+                <a href="">Integrations</a>
+                <a href="">Support</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="">Privacy Policy</a>
+                <a href="">Terms of Service</a>
+                <a href="">Compliance</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 AEGIS-SOC. All rights reserved. | Enterprise Cybersecurity Platform</p>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ functionality
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

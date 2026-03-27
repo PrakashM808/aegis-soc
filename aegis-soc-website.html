@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS-SOC | Enterprise Cybersecurity Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #141829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0099ff;
+            --accent-purple: #7c3aed;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --danger: #ff3333;
+            --success: #00ff88;
+            --border-glow: rgba(0, 212, 255, 0.2);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0f1535 100%);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 212, 255, 0.05) 25%, rgba(0, 212, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 212, 255, 0.05) 75%, rgba(0, 212, 255, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 212, 255, 0.05) 25%, rgba(0, 212, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 212, 255, 0.05) 75%, rgba(0, 212, 255, 0.05) 76%, transparent 77%, transparent);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 1.2rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-cyan);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        main {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 3;
+        }
+
+        .hero-content h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .hero-content h1 span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 2px solid var(--accent-cyan);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(20, 24, 41, 0.6);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.15);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .feature-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Pillars Section */
+        .pillars {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .pillar {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 1.5px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pillar:hover {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 212, 255, 0.2);
+        }
+
+        .pillar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pillar-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        .pillar h3 {
+            font-size: 1.4rem;
+            color: var(--accent-cyan);
+        }
+
+        .pillar ul {
+            list-style: none;
+        }
+
+        .pillar li {
+            padding: 0.6rem 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .pillar li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.05), transparent);
+            border-radius: 50%;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-container h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 900;
+        }
+
+        .cta-container p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            border-top: 1px solid var(--border-glow);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-glow);
+            padding-top: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta-container {
+                padding: 2rem;
+            }
+
+            .cta-container h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">⚔️ AEGIS-SOC</div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#pillars">Pillars</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Enterprise <span>Threat Detection</span> & Response</h1>
+                <p>AEGIS-SOC combines cutting-edge threat intelligence, autonomous incident response, and AI-powered analytics in one unified platform. Detect threats in milliseconds. Respond in seconds.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">Start Free Trial</button>
+                    <button class="btn-secondary">View Demo</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2 class="section-title">Powerful <span>Security Capabilities</span></h2>
+            <p class="section-subtitle">Everything you need to protect your enterprise infrastructure</p>
+            
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Advanced Detection</h3>
+                    <p>Multi-layered threat hunting powered by machine learning and behavioral analysis</p>
+                    <ul class="feature-list">
+                        <li>Deception Technology</li>
+                        <li>Browser Isolation</li>
+                        <li>Email Security Gateway</li>
+                        <li>DNS Filtering</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Automated Response</h3>
+                    <p>Orchestrated incident response with customizable playbooks and real-time remediation</p>
+                    <ul class="feature-list">
+                        <li>SOAR Orchestration</li>
+                        <li>Automated Playbooks</li>
+                        <li>Threat Containment</li>
+                        <li>Evidence Collection</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">📊</div>
+                    <h3>Risk Intelligence</h3>
+                    <p>Comprehensive risk scoring and compliance reporting with MITRE ATT&CK mapping</p>
+                    <ul class="feature-list">
+                        <li>Risk Scoring Engine</li>
+                        <li>MITRE Mapping</li>
+                        <li>Trend Analysis</li>
+                        <li>Predictive Analytics</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Integration Hub</h3>
+                    <p>Seamless integration with 50+ security tools and enterprise platforms</p>
+                    <ul class="feature-list">
+                        <li>SIEM Integration</li>
+                        <li>Threat Intel APIs</li>
+                        <li>EDR/XDR Sync</li>
+                        <li>Custom Connectors</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">📈</div>
+                    <h3>Executive Reporting</h3>
+                    <p>Customizable dashboards and reports for board-level visibility and compliance</p>
+                    <ul class="feature-list">
+                        <li>Compliance Reports</li>
+                        <li>Executive Summaries</li>
+                        <li>Forensic Analysis</li>
+                        <li>KPI Dashboards</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Automation</h3>
+                    <p>Intelligent automation with natural language processing and predictive threat modeling</p>
+                    <ul class="feature-list">
+                        <li>ML-Driven Detection</li>
+                        <li>Smart Workflows</li>
+                        <li>Behavioral Baselines</li>
+                        <li>Anomaly Detection</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pillars Section -->
+        <section class="pillars" id="pillars">
+            <h2 class="section-title">Security <span>Feature Matrix</span></h2>
+            <p class="section-subtitle">Six pillars of comprehensive protection</p>
+            
+            <div class="pillars-grid">
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🔑</div>
+                        <h3>Identity & Access</h3>
+                    </div>
+                    <ul>
+                        <li>Passwordless Authentication</li>
+                        <li>Zero Trust Network (ZTNA)</li>
+                        <li>Privileged Access Mgmt (PAM)</li>
+                        <li>Identity Threat Detection</li>
+                    </ul>
+                </div>
+
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🛡️</div>
+                        <h3>Data Protection</h3>
+                    </div>
+                    <ul>
+                        <li>Data Loss Prevention (DLP)</li>
+                        <li>Encryption as a Service</li>
+                        <li>Digital Rights Management</li>
+                        <li>Secure File Sharing</li>
+                    </ul>
+                </div>
+
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🎯</div>
+                        <h3>Advanced Threats</h3>
+                    </div>
+                    <ul>
+                        <li>Deception Technology</li>
+                        <li>Browser Isolation</li>
+                        <li>DNS Filtering</li>
+                        <li>Email Security</li>
+                    </ul>
+                </div>
+
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">⚖️</div>
+                        <h3>Compliance & Governance</h3>
+                    </div>
+                    <ul>
+                        <li>Automated Compliance</li>
+                        <li>Data Privacy Tools</li>
+                        <li>GDPR/CCPA Tooling</li>
+                        <li>Legal Hold & eDiscovery</li>
+                    </ul>
+                </div>
+
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">☁️</div>
+                        <h3>Cloud Security</h3>
+                    </div>
+                    <ul>
+                        <li>CSPM (Cloud Posture)</li>
+                        <li>CWPP (Workload Security)</li>
+                        <li>CIEM (Entitlement Mgmt)</li>
+                        <li>Container Security</li>
+                    </ul>
+                </div>
+
+                <div class="pillar reveal">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🚀</div>
+                        <h3>Future Innovations</h3>
+                    </div>
+                    <ul>
+                        <li>AI-Driven Threat Hunting</li>
+                        <li>Quantum-Safe Crypto</li>
+                        <li>IoT/OT Security</li>
+                        <li>5G Edge Protection</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section" id="contact">
+            <div class="cta-container">
+                <div class="cta-content">
+                    <h2>Ready to Defend Your Enterprise?</h2>
+                    <p>Join industry leaders who trust AEGIS-SOC to detect threats in real-time and respond before damage occurs. Get a personalized demo or start your free 14-day trial today.</p>
+                    <button class="btn-primary">Schedule Demo</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">Integrations</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Compliance</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AEGIS-SOC. All rights reserved. | Enterprise Cybersecurity Platform</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll animation for feature cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Smooth navigation
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+
+        // CTA button animations
+        document.querySelectorAll('.btn-primary, .btn-secondary, .cta-button').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
