@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AEGIS-SOC</title>
+    <style>
+        body { background: #1a1a2e; color: white; font-family: Arial; text-align: center; padding: 50px; }
+        h1 { color: #00d4ff; }
+        textarea { width: 90%; height: 150px; padding: 10px; }
+        button { padding: 10px 20px; background: #00d4ff; color: black; border: none; cursor: pointer; }
+        div { margin: 20px 0; padding: 20px; background: rgba(0,212,255,0.1); border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>AEGIS-SOC Log Analysis</h1>
+    <textarea id="logs" placeholder="Paste logs here"></textarea><br><br>
+    <button onclick="test()">Analyze</button>
+    <div id="out"></div>
+    
+    <script>
+    function test() {
+        var logs = document.getElementById('logs').value;
+        var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc3NDYzOTY3NCwiZXhwIjoxNzc1MjQ0NDc0fQ.GlG6x6yYCmHnM8bK-x51gmExvQn5kS8CamZKr4-m5W0';
+        
+        fetch('http://localhost:3000/api/v1/logs/extract-iocs', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ logContent: logs })
+        })
+        .then(r => r.json())
+        .then(d => {
+            var html = '<h2>Results:</h2>';
+            if (d.success) {
+                html += '<p>Risk: ' + d.data.overallRisk + '</p>';
+                html += '<p>Matches: ' + d.data.totalMatches + '</p>';
+                html += '<p>IoCs: ' + d.data.summary.iocTypes + ' types</p>';
+            }
+            document.getElementById('out').innerHTML = html;
+        })
+        .catch(e => alert('Error: ' + e.message));
+    }
+    </script>
+</body>
+</html>

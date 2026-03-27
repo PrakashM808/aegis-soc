@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS-SOC | Admin Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        /* [Keeping all your existing CSS styles exactly as they are] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #141829;
+            --tertiary-dark: #1a1f3a;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0099ff;
+            --accent-purple: #7c3aed;
+            --danger: #ff3333;
+            --danger-light: #ff6b6b;
+            --success: #00ff88;
+            --warning: #ffa500;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(0, 212, 255, 0.15);
+            --border-subtle: rgba(0, 212, 255, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0f1535 100%);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(10, 14, 39, 0.95);
+            border-right: 1px solid var(--border-glow);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.15);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #0f1535 100%);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            background: rgba(20, 24, 41, 0.7);
+            border: 1px solid var(--border-glow);
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            color: var(--text-light);
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(20, 24, 41, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(20, 24, 41, 0.8);
+            border-color: var(--accent-cyan);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (max-width: 1400px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(20, 24, 41, 0.8) 0%, rgba(20, 24, 41, 0.4) 100%);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(20, 24, 41, 0.5) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2.5rem;
+            opacity: 0.15;
+        }
+
+        /* Alert/Threat Level */
+        .threat-critical {
+            color: var(--danger);
+        }
+
+        .threat-high {
+            color: var(--danger-light);
+        }
+
+        .threat-medium {
+            color: var(--warning);
+        }
+
+        .threat-low {
+            color: var(--success);
+        }
+
+        /* Cards */
+        .card {
+            background: linear-gradient(135deg, rgba(20, 24, 41, 0.8) 0%, rgba(20, 24, 41, 0.4) 100%);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .card-action {
+            background: transparent;
+            border: 1px solid var(--border-glow);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .card-action:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Incidents Table */
+        .incidents-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .incidents-table thead {
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .incidents-table th {
+            text-align: left;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .incidents-table td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .incidents-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .incidents-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        .incident-id {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .incident-type {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .type-malware {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+        }
+
+        .type-phishing {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .type-intrusion {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger-light);
+        }
+
+        .type-exfil {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-open {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+        }
+
+        .status-investigating {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-contained {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-resolved {
+            background: rgba(0, 153, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        /* Severity Meter */
+        .severity-meter {
+            height: 8px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .severity-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .severity-high .severity-fill {
+            width: 95%;
+            background: var(--danger);
+        }
+
+        .severity-medium .severity-fill {
+            width: 65%;
+            background: var(--warning);
+        }
+
+        .severity-low .severity-fill {
+            width: 35%;
+            background: var(--success);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        /* Threat Timeline */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 30px;
+            width: 2px;
+            height: calc(100% + 15px);
+            background: var(--border-glow);
+        }
+
+        .timeline-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--border-glow);
+            border: 2px solid var(--secondary-dark);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .timeline-dot.critical {
+            background: var(--danger);
+            border-color: var(--danger);
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.5);
+        }
+
+        .timeline-dot.warning {
+            background: var(--warning);
+            border-color: var(--warning);
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        .timeline-dot.success {
+            background: var(--success);
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-text {
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border: none;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-danger {
+            background: rgba(255, 51, 51, 0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 51, 51, 0.2);
+        }
+
+        /* Two Column Layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .incidents-table {
+                font-size: 0.85rem;
+            }
+
+            .incidents-table th,
+            .incidents-table td {
+                padding: 0.8rem 0.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card, .stat-card {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            margin-left: 10px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">⚔️ AEGIS</div>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🚨</span>
+                        Incidents
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🔍</span>
+                        Threat Hunting
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Integration
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Compliance
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">⚡</span>
+                        Playbooks
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        Team
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Security Dashboard</h1>
+                <div class="header-controls">
+                    <input type="text" class="search-box" placeholder="🔍 Search threats, incidents...">
+                    <div class="user-profile">
+                        <div class="user-avatar" id="userAvatar">SC</div>
+                        <span id="userName">Security Chief</span>
+                        <button class="btn logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-label">Critical Threats</div>
+                    <div class="stat-value threat-critical" id="criticalThreats">0</div>
+                    <div class="stat-change negative">Loading...</div>
+                    <div class="stat-icon">🚨</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Incidents</div>
+                    <div class="stat-value threat-high" id="activeIncidents">0</div>
+                    <div class="stat-change negative">Loading...</div>
+                    <div class="stat-icon">⚡</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Alerts</div>
+                    <div class="stat-value" id="totalAlerts">0</div>
+                    <div class="stat-change positive">Loading...</div>
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">System Health</div>
+                    <div class="stat-value threat-low">99.8%</div>
+                    <div class="stat-change positive">✓ All sensors active</div>
+                    <div class="stat-icon">✅</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="two-columns">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Threat Detection Timeline (24h)</h2>
+                        <button class="card-action" onclick="refreshData()">Refresh</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="threatChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Threat Distribution</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="threatTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Incidents -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Active Incidents</h2>
+                    <button class="card-action" onclick="loadIncidents()">Refresh</button>
+                </div>
+                <table class="incidents-table">
+                    <thead>
+                        <tr>
+                            <th>Incident ID</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Severity</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incidentsTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center;">Loading incidents...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Threat Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Real-Time Threat Activity</h2>
+                </div>
+                <div class="timeline" id="threatTimeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot critical pulse"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">Now</div>
+                            <div class="timeline-text">🚀 Loading threat activity...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        let token = localStorage.getItem('token');
+        let threatChart, threatTypeChart;
+        
+        // Check authentication
+        if (!token) {
+            window.location.href = '/aegis-admin-dashboard-fixed.html';
+        }
+        
+        // Get user info
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('userName').innerText = user.firstName + ' ' + user.lastName || user.email;
+        document.getElementById('userAvatar').innerText = (user.firstName?.charAt(0) || 'U') + (user.lastName?.charAt(0) || '');
+        
+        async function fetchWithAuth(url) {
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.status === 401) {
+                logout();
+                throw new Error('Unauthorized');
+            }
+            
+            return response;
+        }
+        
+        async function loadDashboardStats() {
+            try {
+                // Load alerts
+                const alertsResponse = await fetchWithAuth(`${API_BASE}/alerts`);
+                const alerts = await alertsResponse.json();
+                
+                // Load incidents
+                const incidentsResponse = await fetchWithAuth(`${API_BASE}/incidents`);
+                const incidents = await incidentsResponse.json();
+                
+                // Update stats
+                const criticalThreats = alerts.filter(a => a.severity === 'CRITICAL').length;
+                document.getElementById('criticalThreats').innerText = criticalThreats;
+                document.getElementById('activeIncidents').innerText = incidents.length;
+                document.getElementById('totalAlerts').innerText = alerts.length;
+                
+                // Update chart data
+                updateCharts(alerts);
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadIncidents() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/incidents`);
+                const incidents = await response.json();
+                
+                const tbody = document.getElementById('incidentsTableBody');
+                if (incidents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No active incidents</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = incidents.map(incident => `
+                    <tr>
+                        <td><span class="incident-id">${incident.id || 'N/A'}</span></td>
+                        <td><span class="incident-type type-${incident.type?.toLowerCase() || 'intrusion'}">${incident.type || 'Unknown'}</span></td>
+                        <td>${incident.title || 'Untitled'}</td>
+                        <td><span class="status-badge status-${incident.status?.toLowerCase() || 'open'}">${incident.status || 'Open'}</span></td>
+                        <td>
+                            <div class="severity-meter severity-${incident.severity?.toLowerCase() || 'medium'}">
+                                <div class="severity-fill"></div>
+                            </div>
+                            ${incident.severity || 'Medium'}
+                        </td>
+                        <td>${new Date(incident.created_at).toLocaleString()}</td>
+                        <td><button class="btn" onclick="viewIncident(${incident.id})">View</button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading incidents:', error);
+            }
+        }
+        
+        function updateCharts(alerts) {
+            // Count alerts by severity
+            const critical = alerts.filter(a => a.severity === 'CRITICAL').length;
+            const high = alerts.filter(a => a.severity === 'HIGH').length;
+            const medium = alerts.filter(a => a.severity === 'MEDIUM').length;
+            const low = alerts.filter(a => a.severity === 'LOW').length;
+            
+            // Update threat type chart
+            if (threatTypeChart) {
+                threatTypeChart.data.datasets[0].data = [critical, high, medium, low];
+                threatTypeChart.update();
+            }
+        }
+        
+        function initCharts() {
+            // Threat Detection Timeline Chart
+            const ctx1 = document.getElementById('threatChart').getContext('2d');
+            threatChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                    datasets: [
+                        {
+                            label: 'Critical Threats',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#ff3333',
+                            backgroundColor: 'rgba(255, 51, 51, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Medium Threats',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#ffa500',
+                            backgroundColor: 'rgba(255, 165, 0, 0.05)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { size: 12 } }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0, 212, 255, 0.1)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { color: 'rgba(0, 212, 255, 0.08)' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+            
+            // Threat Type Distribution Chart
+            const ctx2 = document.getElementById('threatTypeChart').getContext('2d');
+            threatTypeChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#ff3333', '#ff6b6b', '#ffa500', '#00ff88'],
+                        borderColor: '#141829',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function loadThreatTimeline() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/alerts`);
+                const alerts = await response.json();
+                const recentAlerts = alerts.slice(0, 5);
+                
+                const timeline = document.getElementById('threatTimeline');
+                timeline.innerHTML = recentAlerts.map(alert => `
+                    <div class="timeline-item">
+                        <div class="timeline-dot ${alert.severity === 'CRITICAL' ? 'critical' : alert.severity === 'HIGH' ? 'critical' : 'warning'}">
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-time">${new Date(alert.created_at).toLocaleTimeString()}</div>
+                            <div class="timeline-text">${alert.severity === 'CRITICAL' ? '🚨' : '⚠️'} <strong>${alert.title}</strong> - ${alert.description || 'Alert detected'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+            }
+        }
+        
+        function refreshData() {
+            loadDashboardStats();
+            loadIncidents();
+            loadThreatTimeline();
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/aegis-admin-dashboard-fixed.html';
+        }
+        
+        function viewIncident(id) {
+            alert(`Viewing incident ${id} - This would open incident details`);
+        }
+        
+        // Initialize dashboard
+        initCharts();
+        refreshData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+        
+        // Navigation interactions
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+        
+        // Search functionality
+        const searchBox = document.querySelector('.search-box');
+        searchBox.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#incidentsTableBody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+        
+        // Responsive sidebar toggle for mobile
+        if (window.innerWidth <= 768) {
+            const hamburger = document.createElement('button');
+            hamburger.innerHTML = '☰';
+            hamburger.style.cssText = 'position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: var(--accent-cyan); color: #000; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold;';
+            document.body.insertBefore(hamburger, document.body.firstChild);
+            
+            hamburger.addEventListener('click', () => {
+                document.querySelector('.sidebar').classList.toggle('open');
+            });
+        }
+    </script>
+</body>
+</html>
